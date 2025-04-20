@@ -3,10 +3,11 @@ import "dotenv/config";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { reset, seed } from "drizzle-seed";
-import { Layer } from "effect";
+import { Context, Layer } from "effect";
 import { mkdir } from "node:fs/promises";
-import { Database } from "./context";
 import { schema } from "./schema";
+
+class Database extends Context.Tag("Database")<Database, typeof db>() {}
 
 await mkdir("data", { recursive: true });
 
@@ -25,8 +26,6 @@ await reset(testDb, schema);
 await seed(testDb, schema);
 
 export const DatabaseTest = Layer.succeed(Database, testDb);
-
-await mkdir("data", { recursive: true });
 
 const liveClient = new PGlite("data/db.live");
 
