@@ -4,10 +4,10 @@ import { getUsers } from "./get-users";
 import { TracingLive } from "./tracing";
 
 const result = await pipe(
-  getUsers,
-  Effect.provide(DatabaseLive),
-  Effect.provide(TracingLive),
-  Effect.runPromise
+	getUsers,
+	Effect.provide(DatabaseLive),
+	Effect.provide(TracingLive),
+	Effect.runPromise,
 );
 
 console.log(result);
