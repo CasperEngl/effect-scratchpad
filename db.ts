@@ -7,8 +7,6 @@ import { reset, seed } from "drizzle-seed";
 import { Context, Layer } from "effect";
 import { schema } from "./schema";
 
-export class Database extends Context.Tag("Database")<Database, typeof db>() {}
-
 await mkdir("data", { recursive: true });
 
 const testClient = new PGlite("data/db.test");
@@ -24,8 +22,6 @@ await migrate(testDb, {
 
 await reset(testDb, schema);
 await seed(testDb, schema);
-
-export const DatabaseTest = Layer.succeed(Database, testDb);
 
 const liveClient = new PGlite("data/db.live");
 
@@ -43,4 +39,7 @@ if (existingUsers.length === 0) {
 	await seed(db, schema);
 }
 
-export const DatabaseLive = Layer.succeed(Database, db);
+export class Database extends Context.Tag("Database")<Database, typeof db>() {
+	static readonly Live = Layer.succeed(Database, db);
+	static readonly Test = Layer.succeed(Database, testDb);
+}
