@@ -1,0 +1,28 @@
+{
+  "name": "effect-scratchpad",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.2.17",
+    "@types/bun": "latest",
+    "@vitest/ui": "^3.1.1",
+    "dotenv": "^16.5.0",
+    "drizzle-kit": "^0.31.0",
+    "drizzle-orm": "^0.42.0",
+    "drizzle-seed": "^0.3.1",
+    "vitest": "^3.1.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "effect": "^3.14.11",
+    "postgres": "^3.4.5"
+  }
+}

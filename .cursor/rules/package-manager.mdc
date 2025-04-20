@@ -1,0 +1,179 @@
+---
+description: Running, installing and uninstalling scripts and packages
+globs: 
+alwaysApply: false
+---
+# Using `nr` for npm run, `ni` for npm install, and `nun` for npm uninstall
+
+## I. Introduction to `nr`, `ni`, and `nun`
+
+*   `nr` is a command-line tool designed to make running npm scripts easier.
+*   `ni` is a command-line tool designed to make running npm installs easier.
+*   `nun` is a command-line tool designed to make running npm uninstalls easier.
+*   They are shortcuts for common npm commands, reducing typing and improving workflow.
+*   They automatically detect the package manager (npm, yarn, pnpm) used in your project.
+
+## II. Installation
+
+### A. Checking for `nr`, `ni`, and `nun` and Installing if Needed
+
+*   Since `nr`, `ni`, and `nun` are part of `@darkobits/nr`, you can check if they are installed by running:
+
+    ```bash
+    nr --version
+    ```
+
+    or
+
+     ```bash
+    ni --version
+    ```
+
+    or
+
+    ```bash
+    nun --version
+    ```
+*   If you receive a "command not found" error, it means you need to install `@darkobits/nr` globally:
+
+    ```bash
+    npm install -g @darkobits/nr
+    ```
+
+    Alternatively, using Yarn:
+
+    ```bash
+    yarn global add @darkobits/nr
+    ```
+
+    Or, using pnpm:
+
+    ```bash
+    pnpm add -g @darkobits/nr
+    ```
+
+*   After installation, verify by running `nr --version`, `ni --version` or `nun --version` again. You should now see the version number.
+
+## III. Usage
+
+### A. `npm install` equivalent
+
+*   **Command:**
+    ```bash
+    ni  # shorthand (for `npm install`)
+    ```
+    OR
+    ```bash
+    ni install # explicit
+    ```
+*   **Functionality:**  This command automatically executes the appropriate install command based on your project's package manager (npm install, yarn install, pnpm install).  It installs dependencies listed in your `package.json`.
+*   **Options:**
+    *   `ni install` supports the common install flags, such as `--no-package-lock`, etc. Refer to your package manager documentation for specifics.
+    *   **Adding a dev dependency:** Use `ni -D <package-name>` to install a package as a development dependency. This is equivalent to `npm install --save-dev <package-name>`, `yarn add -D <package-name>`, or `pnpm add -D <package-name>`. Dev dependencies are typically tools used for development, testing, or building your project (e.g., linters, formatters, testing frameworks). Example: `ni -D eslint`
+
+### B. `npm run` equivalent
+
+*   **Listing available scripts:**
+    ```bash
+    nr
+    ```
+    *   This will display a list of available scripts defined in your `package.json` file.
+
+*   **Running a script:**
+    ```bash
+    nr <script-name>
+    ```
+    *   Replace `<script-name>` with the name of the script you want to execute (e.g., `nr start`, `nr build`, `nr test`).
+*   **Passing arguments to scripts:**
+    ```bash
+    nr <script-name> -- <argument1> <argument2>
+    ```
+    *   Use `--` to separate `nr` options from the arguments you want to pass to the underlying npm script. Example: `nr test -- --watchAll`
+
+### C. `npm uninstall` equivalent
+
+*   **Command:**
+
+    ```bash
+    nun <package-name> # shorthand for npm uninstall
+    ```
+
+*   **Functionality:** This command uninstalls the specified package from your project, and removes it from your `package.json` file. It uses the appropriate uninstall command based on your package manager (npm uninstall, yarn remove, pnpm remove).
+
+*   **Options:**
+    *   `nun` supports common uninstall flags.  Consult your package manager's documentation for specific options (e.g., for removing dev dependencies).
+
+### D. Other Use Cases & Examples
+
+*   **Running multiple scripts sequentially:** While `nr` primarily focuses on single script execution, you can combine it with other shell commands for sequential execution:
+    ```bash
+    nr build && nr test
+    ```
+    This will first run the `build` script and then, if successful, run the `test` script.
+*   **Using with concurrently or similar tools:** For running scripts in parallel, you'd typically use tools like `concurrently` or `npm-run-all`. While `nr` doesn't directly replace these, you can use them in conjunction:
+    ```bash
+    npm install -g concurrently  #or yarn/pnpm add -g concurrently
+    concurrently "nr build" "nr test"
+    ```
+*   **Combining with `npx`:**  If you need to run a command that's in your `node_modules` but *not* defined as an npm script, you can use `npx` along with `nr` for convenience (though `nr` doesn't directly enhance this):
+
+    ```bash
+    npx <command>
+    ```
+    (Example: `npx eslint .` to run eslint on your project)  While not directly related to `nr`, it's a common companion tool.
+*   **Using `nr` within npm scripts:** You can actually use `nr` *inside* your npm scripts defined in `package.json`.  This might be useful for simplifying command chaining within a script:
+
+    ```json
+    {
+      "scripts": {
+        "complex-task": "nr clean && nr build && nr deploy"
+      }
+    }
+    Then you can simply run `nr complex-task`
+
+### E. Leveraging Custom Scripts in `package.json`
+
+*   The real power comes from well-defined, descriptive scripts in your `package.json`. Use `nr` to easily execute these pre-defined tasks. Example:
+    ```json
+    {
+      "scripts": {
+        "format": "prettier --write .",
+        "lint": "eslint .",
+        "check": "nr format && nr lint"
+      }
+    }
+    ```
+
+### F. Checking if a Package is Installed Before Installing
+
+*   **`nr`, `ni`, and `nun` don't directly provide a built-in way to check if a package is already installed or to check before uninstalling.** You'll need to rely on other methods, often using shell commands, and combine them with `ni` or `nun` for conditional installation or uninstallation. This is useful when you want to install a package only if it's not already in your `node_modules` directory, or uninstall only if it's present.
+
+*   **Using `npm list` or `yarn list` or `pnpm list` (and `grep`)**
+
+    *   This method involves using the package manager's list command and filtering the output to check if the package exists in your project's dependencies.
+
+    *   Example (Bash - checking before uninstalling):
+
+        ```bash
+        if npm list | grep -q "package-name"; then
+          echo "Package 'package-name' is installed in the project. Uninstalling..."
+          nun package-name
+        else
+          echo "Package 'package-name' is not installed. Skipping uninstall."
+        fi
+        ```
+
+        *   Replace `package-name` with the actual package name.
+
+    *   Example (Cross-platform using `npm show` - checking before uninstalling):
+        ```bash
+        if npm show package-name > /dev/null 2>&1; then
+          echo "Package 'package-name' is installed.  Uninstalling..."
+          nun package-name
+        else
+          echo "Package 'package-name' is not installed.  Skipping uninstall."
+        fi
+        ```
+
+        * This approach attempts to retrieve package information using `npm show`. If the package isn't installed, `npm show` will return an error, which is redirected to `/dev/null` to suppress the output.
+        * Adapt the code to yarn or pnpm
