@@ -22,6 +22,8 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@effect/opentelemetry": "^0.46.7",
+    "@opentelemetry/sdk-trace-base": "^2.0.0",
     "effect": "^3.14.11",
     "postgres": "^3.4.5"
   }

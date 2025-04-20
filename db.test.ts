@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import { Database } from "./context";
 import { getUsers } from "./get-users";
 import { schema } from "./schema";
+import { TracingTest } from "./tracing";
 
 await mkdir("data", { recursive: true });
 
@@ -33,6 +34,7 @@ describe("Database", () => {
     const users = await pipe(
       getUsers,
       Effect.provide(DatabaseTest),
+      Effect.provide(TracingTest),
       Effect.runPromise
     );
     expect(users[0]?.name).toBe("Melanny");
