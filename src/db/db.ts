@@ -1,36 +1,43 @@
 import { PGlite } from "@electric-sql/pglite";
 import "dotenv/config";
-import { mkdir } from "node:fs/promises";
-import { drizzle } from "drizzle-orm/pglite";
-import { migrate } from "drizzle-orm/pglite/migrator";
+import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
+import { migrate as migratePglite } from "drizzle-orm/pglite/migrator";
+import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
+import { migrate as migratePostgres } from "drizzle-orm/postgres-js/migrator";
 import { reset, seed } from "drizzle-seed";
 import { Context, Layer } from "effect";
+import { mkdir } from "node:fs/promises";
+import postgres from "postgres";
 import { schema } from "./schema";
 
 await mkdir("data", { recursive: true });
 
 const testClient = new PGlite("data/db.test");
 
-export const testDb = drizzle({
+export const testDb = drizzlePglite({
 	client: testClient,
 	schema,
 });
 
-await migrate(testDb, {
+await migratePglite(testDb, {
 	migrationsFolder: "./drizzle",
 });
 
 await reset(testDb, schema);
 await seed(testDb, schema);
 
-const liveClient = new PGlite("data/db.live");
+if (!process.env.DATABASE_URL) {
+	throw new Error("DATABASE_URL is not set");
+}
 
-export const db = drizzle({
+const liveClient = postgres(process.env.DATABASE_URL);
+
+export const db = drizzlePostgres({
 	client: liveClient,
 	schema,
 });
 
-await migrate(db, {
+await migratePostgres(db, {
 	migrationsFolder: "./drizzle",
 });
 
@@ -39,7 +46,10 @@ if (existingUsers.length === 0) {
 	await seed(db, schema);
 }
 
-export class Database extends Context.Tag("Database")<Database, typeof db>() {
+export class Database extends Context.Tag("Database")<
+	Database,
+	typeof db | typeof testDb
+>() {
 	static readonly Live = Layer.succeed(Database, db);
 	static readonly Test = Layer.succeed(Database, testDb);
 }
