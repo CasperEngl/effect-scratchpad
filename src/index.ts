@@ -1,6 +1,6 @@
 import { Effect, pipe } from "effect";
-import { Database } from "./db";
-import { getUsers } from "./get-users";
+import { Database } from "./db/db";
+import { getUsers } from "./db/get-users";
 import { TracingLive } from "./tracing";
 
 const result = await pipe(

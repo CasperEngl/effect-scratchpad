@@ -1,15 +1,15 @@
 {
 	"name": "effect-scratchpad",
-	"module": "index.ts",
+	"module": "src/index.ts",
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"start": "bun run index.ts",
-		"test": "vitest",
-		"test:ui": "vitest --ui",
-		"test:coverage": "vitest run --coverage",
-		"lint": "biome check --write .",
-		"format": "biome format --write ."
+		"start": "bun run src/index.ts",
+		"test": "vitest --config ./config/vitest.config.ts",
+		"test:ui": "vitest --config ./config/vitest.config.ts --ui",
+		"test:coverage": "vitest --config ./config/vitest.config.ts run --coverage",
+		"lint": "biome check --config ./config/biome.json --write .",
+		"format": "biome format --config ./config/biome.json --write ."
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
