@@ -1,9 +1,5 @@
-import { Data, Effect, pipe } from "effect";
-import { Database } from "./db";
-
-class DatabaseError extends Data.TaggedError("DatabaseError")<{
-	message: string;
-}> {}
+import { Effect } from "effect";
+import { Database, DatabaseError } from "~/db/context";
 
 export const getUsers = Effect.gen(function* (_) {
 	const db = yield* _(Database);

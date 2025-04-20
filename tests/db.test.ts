@@ -1,7 +1,7 @@
 import { Effect, pipe } from "effect";
 import { describe, expect, it } from "vitest";
-import { Database } from "../src/db/db";
-import { getUsers } from "../src/db/get-users";
+import { Database } from "~/db/context";
+import { getUsers } from "~/db/get-users";
 
 describe("Database", () => {
 	describe("getUsers", () => {
