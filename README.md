@@ -1,4 +1,4 @@
-# effect-scratchpad
+# Effect Scratchpad
 
 A TypeScript project using Effect, Drizzle, and PostgreSQL.
 
