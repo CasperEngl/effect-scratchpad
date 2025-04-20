@@ -2,7 +2,7 @@ import { PGlite } from "@electric-sql/pglite";
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
-import { seed } from "drizzle-seed";
+import { reset, seed } from "drizzle-seed";
 import { Layer } from "effect";
 import { mkdir } from "node:fs/promises";
 import { Database } from "./context";
@@ -10,10 +10,28 @@ import { schema } from "./schema";
 
 await mkdir("data", { recursive: true });
 
-const client = new PGlite("data/db.live");
+const testClient = new PGlite("data/db.test");
+
+export const testDb = drizzle({
+  client: testClient,
+  schema,
+});
+
+await migrate(testDb, {
+  migrationsFolder: "./drizzle",
+});
+
+await reset(testDb, schema);
+await seed(testDb, schema);
+
+export const DatabaseTest = Layer.succeed(Database, testDb);
+
+await mkdir("data", { recursive: true });
+
+const liveClient = new PGlite("data/db.live");
 
 export const db = drizzle({
-  client,
+  client: liveClient,
   schema,
 });
 
